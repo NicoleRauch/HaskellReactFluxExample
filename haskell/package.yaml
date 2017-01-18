@@ -1,0 +1,33 @@
+name:                example
+version:             0.1.0.0
+synopsis:            Initial project template from stack
+description:         Please see README.md
+author:              Nicole Rauch
+maintainer:          info@nicole-rauch.de
+copyright:           2016-2021 Nicole Rauch
+category:            Web
+github:              nicolerauch/xxx
+extra-source-files:  README.md
+
+ghc-options: -Wall -Werror
+
+dependencies:
+- base >= 4.7 && < 5
+- containers
+- deepseq
+- ghcjs-base
+- react-flux
+- react-flux-servant
+- string-conversions
+- text
+
+library:
+  source-dirs: src
+
+executables:
+  frontend:
+    source-dirs: app
+    main: Main.hs
+    dependencies:
+    - example
+    cpp-options: -DGHCJS_BROWSER
