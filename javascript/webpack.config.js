@@ -32,10 +32,9 @@ module.exports = {
             }
         })
     ],
-    devtool: "source-map",
     module: {
         loaders: [
-            { test: /\.js$/, loaders: ["babel"], include: path.join(__dirname, "js-example") }
+            { test: /\.js$/, loaders: ["react-hot", "babel"], include: path.join(__dirname, "js-example") }
         ]
     }
 };
