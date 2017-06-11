@@ -3,6 +3,8 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+{-# LANGUAGE DataKinds, TypeApplications #-}
+
 module ReactFluxExample where
 
 import           Control.DeepSeq
@@ -13,13 +15,13 @@ import qualified Data.Map.Strict as M
 import           GHC.Generics (Generic)
 import           GHCJS.Types (JSVal)
 import           React.Flux
-import           React.Flux.Lifecycle
+import           React.Flux.Outdated
 
 import Debug.Trace
 
 
-exampleApp :: ReactView ()
-exampleApp = defineControllerView "example_app" exampleStore $ \(ExampleState posMap) () ->
+exampleApp :: View '[]
+exampleApp = mkControllerView @'[StoreArg ExampleState] "example_app" $ \(ExampleState posMap) ->
     main_ ["role" $= "main"] $ do
         aside_ $ do
             trace (show posMap) mempty
@@ -33,7 +35,7 @@ exampleApp = defineControllerView "example_app" exampleStore $ \(ExampleState po
 
 data MarkProps = MarkProps
   { _id :: String
-  }
+  } deriving (Eq)
 
 exMark :: ReactView MarkProps
 exMark = defineLifecycleView "ExampleMark" () lifecycleConfig
@@ -53,17 +55,19 @@ exMark_ = view exMark
 data SnippetProps = SnippetProps
   { _id2 :: String
   , _markPosition :: Maybe Int
-  }
+  } deriving (Eq)
 
-snippet :: ReactView SnippetProps
-snippet = defineView "snippet" $ \props ->
+instance UnoverlapAllEq SnippetProps
+
+snippet :: View '[SnippetProps]
+snippet = mkView "snippet" $ \props ->
         case _markPosition props of
             Nothing -> div_ "Nothing"
             Just pos ->
                 div_ . elemString $ "Position " <> show pos
 
 snippet_ :: SnippetProps -> ReactElementM eventHandler ()
-snippet_ props = viewWithIKey snippet 1 props mempty
+snippet_ = view_ snippet "1"
 
 foreign import javascript unsafe
   "$1.getBoundingClientRect().top"
@@ -71,7 +75,7 @@ foreign import javascript unsafe
 
 data ExampleState = ExampleState
   { positions :: M.Map String Int
-  } deriving (Show, Typeable)
+  } deriving (Show, Typeable, Eq)
 
 data ExampleAction = AddPosition String Int
   deriving (Show, Typeable, Generic, NFData)
@@ -88,8 +92,5 @@ instance StoreData ExampleState where
         putStrLn $ "New state: " <> show newState
         return newState
 
-exampleStore :: ReactStore ExampleState
-exampleStore = mkStore $ ExampleState M.empty
-
 dispatch :: ExampleAction -> [SomeStoreAction]
-dispatch a = [SomeStoreAction exampleStore a]
+dispatch a = [someStoreAction @ExampleState a]

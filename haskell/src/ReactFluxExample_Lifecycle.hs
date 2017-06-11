@@ -3,6 +3,8 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+{-# LANGUAGE DataKinds, TypeApplications #-}
+
 module ReactFluxExample_Lifecycle where
 
 import           Control.DeepSeq
@@ -10,14 +12,14 @@ import           Data.Monoid ((<>))
 import           Data.Typeable (Typeable)
 import           GHC.Generics (Generic)
 import           React.Flux
-import           React.Flux.Lifecycle
+import           React.Flux.Outdated
 
 {- NOINLINE exampleApp  -}
 {- NOINLINE lifecycleC  -}
 {- NOINLINE exampleStore  -}
 
-exampleApp :: ReactView ()
-exampleApp = defineControllerView "ExampleApp" exampleStore $ \(ExampleState visible) () ->
+exampleApp :: View '[]
+exampleApp = mkControllerView @'[StoreArg ExampleState] "ExampleApp" $ \(ExampleState visible) ->
   div_ $ do
     button_ [ onClick $ \_ _ -> dispatch ToggleVisible ] "Click here!"
     div_ . elemString $ "Outside: " ++ show visible
@@ -35,7 +37,7 @@ lifecycleC_ = view lifecycleC ()
 
 data ExampleState = ExampleState
   { isVisible :: Bool
-  } deriving (Show, Typeable)
+  } deriving (Show, Typeable, Eq)
 
 data ExampleAction = ToggleVisible
   deriving (Show, Typeable, Generic, NFData)
@@ -52,8 +54,5 @@ instance StoreData ExampleState where
         putStrLn $ "New state: " <> show newState
         return newState
 
-exampleStore :: ReactStore ExampleState
-exampleStore = mkStore $ ExampleState False
-
 dispatch :: ExampleAction -> [SomeStoreAction]
-dispatch a = [SomeStoreAction exampleStore a]
+dispatch a = [someStoreAction @ExampleState a]

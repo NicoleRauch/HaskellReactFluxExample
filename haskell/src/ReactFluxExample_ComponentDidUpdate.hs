@@ -3,17 +3,19 @@
 {-# LANGUAGE DeriveAnyClass    #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+{-# LANGUAGE DataKinds, TypeApplications #-}
+
 module ReactFluxExample_ComponentDidUpdate where
 
 import           Control.DeepSeq
 import           Data.Typeable (Typeable)
 import           GHC.Generics (Generic)
 import           React.Flux
-import           React.Flux.Lifecycle
+import           React.Flux.Outdated
 
 
-exampleApp :: ReactView ()
-exampleApp = defineControllerView "ExampleApp" exampleStore $ \_ _ ->
+exampleApp :: View '[]
+exampleApp = mkControllerView @'[StoreArg ExampleState] "ExampleApp" $ \_ ->
     lifecycleC_
 
 
@@ -27,7 +29,7 @@ lifecycleC_ :: ReactElementM eventHandler ()
 lifecycleC_ = view lifecycleC () mempty
 
 data ExampleState = ExampleState
-  deriving (Show, Typeable)
+  deriving (Show, Typeable, Eq)
 
 data ExampleAction = ExampleAction
   deriving (Show, Typeable, Generic, NFData)
@@ -35,6 +37,3 @@ data ExampleAction = ExampleAction
 instance StoreData ExampleState where
     type StoreAction ExampleState = ExampleAction
     transform _ state = return state
-
-exampleStore :: ReactStore ExampleState
-exampleStore = mkStore ExampleState
