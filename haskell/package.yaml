@@ -16,8 +16,8 @@ dependencies:
 - containers
 - deepseq
 - ghcjs-base
-- react-flux
-- react-flux-servant
+- react-hs
+- react-hs-servant
 - string-conversions
 - text
 

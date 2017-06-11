@@ -1,17 +1,26 @@
-resolver: lts-7.1
-compiler: ghcjs-0.2.1.9007001_ghc-8.0.1
+resolver: lts-8.11
+
+compiler: ghcjs-0.2.1.9008011_ghc-8.0.2
+
 compiler-check: match-exact
 extra-deps:
-- react-flux-1.2.3
-- react-flux-servant-0.1.1
+- react-hs-0.0.1
+- react-hs-servant-0.0.1
 - string-0.4.0
 
 packages:
 - location: '.'
+- location:
+    git: https://github.com/liqula/react-hs
+    commit: 3b77a36f3ed869ba37e870f40729017a3e0d5764
+  extra-dep: true
+  subdirs:
+  - react-hs
+  - react-hs-servant
 
 setup-info:
   ghcjs:
     source:
-      ghcjs-0.2.1.9007001_ghc-8.0.1:
-          url: http://tolysz.org/ghcjs/ghc-8.0-2016-09-26-lts-7.1-9007001-mem.tar.gz
-          sha1: e640724883238593e2d2f7f03991cb413ec0347b
+      ghcjs-0.2.1.9008011_ghc-8.0.2:
+        url: https://github.com/zerobuzz/ghcjs-stack-dist/raw/master/ghcjs-0.2.1.9008011.tar.gz
+        sha1: a72a5181124baf64bcd0e68a8726e65914473b3b
