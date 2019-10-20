@@ -23,17 +23,17 @@ exampleApp = mkControllerView @'[StoreArg ExampleState] "ExampleApp" $ \(Example
   div_ $ do
     button_ [ onClick $ \_ _ -> dispatch ToggleVisible ] "Click here!"
     div_ . elemString $ "Outside: " ++ show visible
-    lifecycleC_ $ do
+    lifecycleC_ visible $ do
         div_ . elemString $ "Inside: " ++ show visible
 
 
-lifecycleC :: ReactView ()
+lifecycleC :: Typeable a => ReactView a
 lifecycleC = defineLifecycleView "ALifecycleComponent" () lifecycleConfig
    { lRender = \_ _ -> childrenPassedToView
    }
 
-lifecycleC_ :: ReactElementM eventHandler () -> ReactElementM eventHandler ()
-lifecycleC_ = view lifecycleC ()
+lifecycleC_ :: Typeable a => a -> ReactElementM eventHandler () -> ReactElementM eventHandler ()
+lifecycleC_ = view lifecycleC
 
 data ExampleState = ExampleState
   { isVisible :: Bool
